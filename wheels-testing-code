@@ -84,19 +84,33 @@ void setup() {
   Serial.begin(9600);
 }
 
-void loop () {
-  Serial.println("apple!");
+void loop () {  // comment out what you would not like to test
+
+  Serial.println("forwards!");
   wheelsGoForwards(500);
   stopWheels(500);
   
-  Serial.println("let there be light!");
+  Serial.println("let there be light!"); // LED on PCB for debugging purposes
   pinMode(10, HIGH);
   delay(2000);
   pinMode(10, LOW);
 
-  Serial.println("banana!");
+  Serial.println("backwards!");
   wheelsGoBackwards(500);
   stopWheels(500);
+  
+  Serial.println("left!");
+  wheelsGoLeft(500);
+  stopWheels(500);
+  
+  Serial.println("right!");
+  wheelsGoRight(500);
+  stopWheels(500);
+  
+  Serial.println("rotate left!");
+  wheelsRotateLeft(500);
+  stopWheels(500);
+  
 
 }
 
