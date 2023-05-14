@@ -1,0 +1,209 @@
+
+const int x = 20;
+
+
+// Motor Wheel Pins
+const int LEFT_BACK_WHEEL_FORWARDS = 38;
+const int LEFT_BACK_WHEEL_BACKWARDS = 40;
+const int LEFT_FRONT_WHEEL_FORWARDS = 36;
+const int LEFT_FRONT_WHEEL_BACKWARDS = 34;
+const int RIGHT_BACK_WHEEL_FORWARDS = 46;
+const int RIGHT_BACK_WHEEL_BACKWARDS = 48;
+const int RIGHT_FRONT_WHEEL_FORWARDS = 50;
+const int RIGHT_FRONT_WHEEL_BACKWARDS = 52;
+
+int wheel_motor_pins[8] = {LEFT_BACK_WHEEL_FORWARDS, LEFT_FRONT_WHEEL_FORWARDS, RIGHT_FRONT_WHEEL_FORWARDS, RIGHT_BACK_WHEEL_FORWARDS, LEFT_FRONT_WHEEL_BACKWARDS, LEFT_BACK_WHEEL_BACKWARDS, RIGHT_BACK_WHEEL_BACKWARDS, RIGHT_FRONT_WHEEL_BACKWARDS};
+
+// Sensor Pins 
+const int LEFT_SENSOR_TRIGGER = 36;
+const int LEFT_SENSOR_ECHO = 37;
+const int RIGHT_SENSOR_TRIGGER = 3;
+const int RIGHT_SENSOR_ECHO = 4;
+const int LEDGE_SENSOR_TRIGGER = 12;
+const int LEDGE_SENSOR_ECHO = 9;
+
+int sensor_pins[6] = {LEFT_SENSOR_TRIGGER, RIGHT_SENSOR_TRIGGER, LEDGE_SENSOR_TRIGGER, LEFT_SENSOR_ECHO, RIGHT_SENSOR_ECHO, LEDGE_SENSOR_ECHO};
+
+// Scooper Motor Pins
+
+const int EXTENDER_FORWARDS = x;
+const int EXTENDER_BACKWARDS = x;
+const int EXTENDER_SPEED = x;
+const int BALL_REMOVER_FORWARDS = x;
+const int BALL_REMOVER_BACKWARDS = x;
+const int BALL_REMOVER_SPEED = x;
+const int LIFTER_FORWARDS = x;
+const int LIFTER_BACKWARDS = x;
+const int LIFTER_SPEED = x;
+
+int scooper_motor_pins[9] = {EXTENDER_FORWARDS, EXTENDER_BACKWARDS, EXTENDER_SPEED, BALL_REMOVER_FORWARDS, BALL_REMOVER_BACKWARDS, BALL_REMOVER_SPEED, LIFTER_FORWARDS, LIFTER_BACKWARDS, LIFTER_SPEED};
+
+
+int state = 0;
+
+// Times for different exercises
+
+const int TENNIS_ARM_LIFTING_TIME = 3000;
+const int SQUASH_ARM_LIFTING_TIME = x;
+const int TENNIS_ARM_EXTENDING_TIME = x;
+const int SQUASH_ARM_EXTENDING_TIME = x;
+const int FINAL_RIGHT_MOVEMENT_TIME = x;
+const int QUARTER_TURN_TIME = x;
+const int HALF_TURN_TIME = x;
+const int MIDDLING_TIME = x;
+
+
+void setup() {
+
+  // Set Wheel Motor Pins
+
+  for(int i = 0; i < 8; i++) {
+    pinMode(wheel_motor_pins[i], OUTPUT);
+  }
+ 
+  // Set Sensor Pins
+
+  for (int i = 0; i < 6; i++) {
+
+    if (i < 3) {
+      pinMode(sensor_pins[i], OUTPUT);
+    }
+    else {
+      pinMode(sensor_pins[i], INPUT);
+    }
+  }
+
+  // Set Scooper Motor Pins
+
+  for(int i = 0; i < 9; i++) {
+    pinMode(scooper_motor_pins[i], OUTPUT);
+  }
+
+  pinMode(10, OUTPUT);
+
+  Serial.begin(9600);
+}
+
+void loop () {
+  Serial.println("apple!");
+  wheelsGoForwards(500);
+  stopWheels(500);
+  
+  Serial.println("let there be light!");
+  pinMode(10, HIGH);
+  delay(2000);
+  pinMode(10, LOW);
+
+  Serial.println("banana!");
+  wheelsGoBackwards(500);
+  stopWheels(500);
+
+}
+
+int sensorDistance(int trigger_pin, int echo_pin) {
+
+  unsigned long duration;
+  int distance; 
+
+  digitalWrite(trigger_pin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigger_pin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigger_pin, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echo_pin, HIGH);
+  // Calculating the distance
+  distance = duration * 0.034 / 2;
+
+  delay(20);
+  
+  return distance;
+}
+
+
+void stopWheels(int delay_time){
+
+  for(int i = 0; i < 8; i++) {
+    
+    digitalWrite(wheel_motor_pins[i], LOW);
+  }
+
+  delay(delay_time);
+}
+
+
+void wheelsGoForwards(int delay_time) {
+
+
+  for(int i = 0; i < 4; i++) {
+    
+    digitalWrite(wheel_motor_pins[i], HIGH);
+  }
+
+  delay(delay_time);
+
+}
+
+void wheelsGoBackwards(int delay_time) {
+
+  for(int i = 4; i < 8; i++) {
+    
+    digitalWrite(wheel_motor_pins[i], HIGH);
+  }
+
+  delay(delay_time);
+}
+
+
+void wheelsGoLeft(int delay_time) {
+
+  for(int i = 0; i < 8; i += 2) {
+    
+    digitalWrite(wheel_motor_pins[i], HIGH);
+  }
+
+  delay(delay_time);
+  
+}
+
+void wheelsGoRight(int delay_time) {
+
+
+  for(int i = 1; i < 8; i += 2) {
+    
+    digitalWrite(wheel_motor_pins[i], HIGH);
+  }
+
+  delay(delay_time);
+  
+}
+
+void wheelsRotateLeft(int delay_time) {
+
+  for(int i = 2; i < 6; i++) {
+    
+    digitalWrite(wheel_motor_pins[i], HIGH);
+  }
+
+  delay(delay_time);
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
