@@ -48,6 +48,17 @@ const int QUARTER_TURN_TIME = x;
 const int HALF_TURN_TIME = x;
 const int MIDDLING_TIME = x;
 
+// Constants idk
+
+const int INITIAL_DROP_ARM = 11;
+const int DRIVE_TO_RIGHT_LEDGE = 12;
+const int FIRST_DRIVE_TENNIS_PLATFORM = 13;
+const int LIFT_TENNIS_SILO = 21;
+const int SECOND_DRIVE_TENNIS_SILO = 22;
+const int EXTEND_TENNIS_SILO = 23;
+const int DEPOSIT_TENNIS = 24;
+
+
 
 void setup() {
 
