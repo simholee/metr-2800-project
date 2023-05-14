@@ -277,7 +277,7 @@ void loop() {
         Serial.println("I am here, look at me");
       }
       else {
-        wheelsGoForward(20);
+        wheelsGoForwards(20);
       }
       
       break;
@@ -438,7 +438,7 @@ void stopWheels(int delay_time){
 }
 
 
-void wheelsGoForward(int delay_time) {
+void wheelsGoForwards(int delay_time) {
 
 
   for(int i = 0; i < 4; i++) {
