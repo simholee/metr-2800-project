@@ -174,10 +174,10 @@ void loop() {
       break;
       
     case 25:
-      // drop arm [tennis ball]
-      Serial.println("State 6");
+      // retract arm [tennis ball]
+      Serial.println("State 7");
       
-      dropArm(TENNIS_ARM_LIFTING_TIME);
+      retractArm(TENNIS_ARM_EXTENDING_TIME);
       delay(500);
       
       state = 26;
@@ -185,10 +185,10 @@ void loop() {
       break;
       
     case 26:
-      // retract arm [tennis ball]
-      Serial.println("State 7");
+      // drop arm [tennis ball]
+      Serial.println("State 6");
       
-      retractArm(TENNIS_ARM_EXTENDING_TIME);
+      dropArm(TENNIS_ARM_LIFTING_TIME);
       delay(500);
       
       state = 31;
@@ -329,10 +329,10 @@ void loop() {
       break;
       
     case 54:
-      // drop arm [squash ball]
-      Serial.println("State 16");
+      // retract arm [squash ball]
+      Serial.println("State 17");
       
-      dropArm(SQUASH_ARM_LIFTING_TIME);
+      retractArm(SQUASH_ARM_EXTENDING_TIME);
       delay(500);
       
       state = 55;
@@ -340,10 +340,10 @@ void loop() {
       break;
       
     case 55:
-      // retract arm [squash ball]
-      Serial.println("State 17");
+      // drop arm [squash ball]
+      Serial.println("State 16");
       
-      retractArm(SQUASH_ARM_EXTENDING_TIME);
+      dropArm(SQUASH_ARM_LIFTING_TIME);
       delay(500);
       
       state = 61;
