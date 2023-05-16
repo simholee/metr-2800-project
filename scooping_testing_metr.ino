@@ -47,6 +47,7 @@ const int FINAL_RIGHT_MOVEMENT_TIME = x;
 const int QUARTER_TURN_TIME = x;
 const int HALF_TURN_TIME = x;
 const int MIDDLING_TIME = x;
+const int RACKING_TIME = 500;
 
 
 void setup() {
@@ -264,7 +265,7 @@ void wheelsRotateLeft(int delay_time) {
 }
 
 void liftArm(int delay_time) {
-  int motor_speed = x;
+  int motor_speed = 255;
 
   analogWrite(scooper_motor_pins[8], motor_speed);
   digitalWrite(scooper_motor_pins[6], HIGH);
@@ -276,7 +277,7 @@ void liftArm(int delay_time) {
 }
 
 void dropArm(int delay_time) {
-  int motor_speed = x; // motor speed (0-255)
+  int motor_speed = 255; // motor speed (0-255)
 
   analogWrite(scooper_motor_pins[8], motor_speed);
   digitalWrite(scooper_motor_pins[7], HIGH);
@@ -288,7 +289,7 @@ void dropArm(int delay_time) {
 }
 
 void extendArm(int delay_time) {
-  int motor_speed = x; // motor speed (0-255)
+  int motor_speed = 255; // motor speed (0-255)
 
   analogWrite(scooper_motor_pins[2], motor_speed);
   digitalWrite(scooper_motor_pins[0], HIGH);
@@ -300,7 +301,7 @@ void extendArm(int delay_time) {
 }
 
 void retractArm(int delay_time) {
-  int motor_speed = x; // motor speed (0-255)
+  int motor_speed = 255; // motor speed (0-255)
 
   analogWrite(scooper_motor_pins[2], motor_speed);
   digitalWrite(scooper_motor_pins[0], HIGH);
@@ -312,8 +313,8 @@ void retractArm(int delay_time) {
 }
 
 void rackOut() {
-  int motor_speed = x; // motor speed (0-255)
-  int delay_time = x; // time of motor operation (ms)
+  int motor_speed = 255; // motor speed (0-255)
+  int delay_time = RACKING_TIME; // time of motor operation (ms)
 
   analogWrite(scooper_motor_pins[5], motor_speed);
   digitalWrite(scooper_motor_pins[3], HIGH);
@@ -325,8 +326,8 @@ void rackOut() {
 }
 
 void rackIn() {
-  int motor_speed = x; // motor speed (0-255)
-  int delay_time = x; // time of motor operation (ms)
+  int motor_speed = 255; // motor speed (0-255)
+  int delay_time = RACKING_TIME; // time of motor operation (ms)
 
   analogWrite(scooper_motor_pins[5], motor_speed);
   digitalWrite(scooper_motor_pins[4], HIGH);
