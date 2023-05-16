@@ -496,7 +496,7 @@ void wheelsRotateLeft(int delay_time) {
 }
 
 void liftArm(int delay_time) {
-  int motor_speed = x;
+  int motor_speed = 255;
 
   analogWrite(scooper_motor_pins[9], motor_speed);
   digitalWrite(scooper_motor_pins[7], HIGH);
@@ -508,7 +508,7 @@ void liftArm(int delay_time) {
 }
 
 void dropArm(int delay_time) {
-  int motor_speed = x; // motor speed (0-255)
+  int motor_speed = 255; // motor speed (0-255)
 
   analogWrite(scooper_motor_pins[9], motor_speed);
   digitalWrite(scooper_motor_pins[8], HIGH);
@@ -520,7 +520,7 @@ void dropArm(int delay_time) {
 }
 
 void extendArm(int delay_time) {
-  int motor_speed = x; // motor speed (0-255)
+  int motor_speed = 255; // motor speed (0-255)
 
   analogWrite(scooper_motor_pins[3], motor_speed);
   digitalWrite(scooper_motor_pins[1], HIGH);
@@ -532,7 +532,7 @@ void extendArm(int delay_time) {
 }
 
 void retractArm(int delay_time) {
-  int motor_speed = x; // motor speed (0-255)
+  int motor_speed = 255; // motor speed (0-255)
 
   analogWrite(scooper_motor_pins[3], motor_speed);
   digitalWrite(scooper_motor_pins[2], HIGH);
@@ -544,7 +544,7 @@ void retractArm(int delay_time) {
 }
 
 void rackOut() {
-  int motor_speed = x; // motor speed (0-255)
+  int motor_speed = 255; // motor speed (0-255)
   int delay_time = x; // time of motor operation (ms)
 
   analogWrite(scooper_motor_pins[6], motor_speed);
@@ -557,7 +557,7 @@ void rackOut() {
 }
 
 void rackIn() {
-  int motor_speed = x; // motor speed (0-255)
+  int motor_speed = 255; // motor speed (0-255)
   int delay_time = x; // time of motor operation (ms)
 
   analogWrite(scooper_motor_pins[6], motor_speed);
