@@ -1,11 +1,11 @@
 
 // Motor Wheel Pins
-const int LEFT_BACK_WHEEL_FORWARDS = 38;
-const int LEFT_BACK_WHEEL_BACKWARDS = 40;
+const int LEFT_BACK_WHEEL_FORWARDS = 40;
+const int LEFT_BACK_WHEEL_BACKWARDS = 38;
 const int LEFT_FRONT_WHEEL_FORWARDS = 36;
 const int LEFT_FRONT_WHEEL_BACKWARDS = 34;
-const int RIGHT_BACK_WHEEL_FORWARDS = 46;
-const int RIGHT_BACK_WHEEL_BACKWARDS = 48;
+const int RIGHT_BACK_WHEEL_FORWARDS = 48;
+const int RIGHT_BACK_WHEEL_BACKWARDS = 46;
 const int RIGHT_FRONT_WHEEL_FORWARDS = 50;
 const int RIGHT_FRONT_WHEEL_BACKWARDS = 52;
 
@@ -29,25 +29,29 @@ const int EXTENDER_SPEED = 12;
 const int BALL_REMOVER_FORWARDS = 26;
 const int BALL_REMOVER_BACKWARDS = 28;
 const int BALL_REMOVER_SPEED = 8;
-const int LIFTER_FORWARDS = 22;
-const int LIFTER_BACKWARDS = 24;
+const int LIFTER_FORWARDS = 24;
+const int LIFTER_BACKWARDS = 22;
 const int LIFTER_SPEED = 9;
 
 int scooper_motor_pins[9] = {EXTENDER_FORWARDS, EXTENDER_BACKWARDS, EXTENDER_SPEED, BALL_REMOVER_FORWARDS, BALL_REMOVER_BACKWARDS, BALL_REMOVER_SPEED, LIFTER_FORWARDS, LIFTER_BACKWARDS, LIFTER_SPEED};
 
-int state = 0;
+int state = 12;
 
 // Times for different exercises
 
-const int TENNIS_ARM_LIFTING_TIME = 3000;
-const int SQUASH_ARM_LIFTING_TIME = x;
-const int TENNIS_ARM_EXTENDING_TIME = x;
-const int SQUASH_ARM_EXTENDING_TIME = x;
-const int FINAL_RIGHT_MOVEMENT_TIME = x;
-const int QUARTER_TURN_TIME = x;
-const int HALF_TURN_TIME = x;
-const int MIDDLING_TIME = x;
-const int RACKING_TIME = x;
+const int TENNIS_ARM_LIFTING_TIME = 5000;
+// const int SQUASH_ARM_LIFTING_TIME = x;
+const int TENNIS_ARM_EXTENDING_TIME = 28000;
+// const int SQUASH_ARM_EXTENDING_TIME = x;
+// const int FINAL_RIGHT_MOVEMENT_TIME = x;
+// const int QUARTER_TURN_TIME = x;
+// const int HALF_TURN_TIME = x;
+// const int MIDDLING_TIME = x;
+const int RACKING_TIME = 2000;
+
+int distance_ledge;
+int distance_left;
+int distance_right;
 
 
 void setup() {
@@ -56,7 +60,11 @@ void setup() {
 
   for(int i = 0; i < 8; i++) {
     pinMode(wheel_motor_pins[i], OUTPUT);
+    pinMode(wheel_motor_pins[i], LOW);
   }
+
+  pinMode(11, OUTPUT);
+  digitalWrite(11, HIGH);
  
   // Set Sensor Pins
 
@@ -81,7 +89,6 @@ void setup() {
 
 void loop() {
   Serial.println("Pissing my pants rn fr");
-  state = 11;
 
   
   switch (state) {
@@ -100,10 +107,12 @@ void loop() {
       // drive right
       Serial.println("State 1");
       
-      int distance_ledge = sensorDistance(LEDGE_SENSOR_TRIGGER, LEDGE_SENSOR_ECHO);
-      
-      if (distance_ledge > 5) {
-        stopWheels(20);
+      distance_ledge = sensorDistance(LEDGE_SENSOR_TRIGGER, LEDGE_SENSOR_ECHO);
+
+      // Serial.println(distance_ledge);
+    
+      if (distance_ledge > 10) {
+        stopWheels(1000);
         state = 13;
       }
       else {
@@ -115,18 +124,26 @@ void loop() {
       // drive forward
       Serial.println("State 2");
       
-      int distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
+      distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
+      distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
 
       Serial.println(distance_left);
-      
-      if (distance_left < 18) {
+      Serial.println(distance_right);
+
+      if (distance_left > 0) {
+        
+        if (distance_right > 0) {
+
+          if (distance_left < 9 && distance_right < 9) {
         stopWheels(20);
         state = 21;
         Serial.println("I am here, look at me");
-      }
-      else {
-        wheelsGoForward(20);
-      }
+        }
+        else {
+          wheelsGoForwards(20);
+        }
+          }
+        }
       
       break;
       
@@ -143,10 +160,30 @@ void loop() {
       
       // DO WE NEED TO DRIVE FORWARD HERE???
     case 22:
-      // go forward or something idk
-      
-      
+
+      wheelsGoForwards(1500);
+      stopWheels(100);
+
       state = 23;
+
+      /*
+      // go forward or something idk
+
+      distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
+      distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
+
+      Serial.println(distance_left);
+      
+      if (distance_left < 3 && distance_right < 3) {
+        stopWheels(20);
+        state = 23;
+        Serial.println("I am here, look at me");
+      }
+      else {
+        wheelsGoForwards(20);
+      }
+
+      */
       
       break;
       
@@ -164,10 +201,10 @@ void loop() {
       // rack and unrack
       Serial.println("State 5");
       
-      rackOut();
+      rackOut(RACKING_TIME);
       delay(500);
       
-      rackIn();
+      rackIn(RACKING_TIME);
       delay(500);
       
       state = 25;
@@ -200,7 +237,7 @@ void loop() {
       // drive backwards
       Serial.println("State 8");
       
-      int distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
+      distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
       
       Serial.println(distance_left);
       
@@ -213,7 +250,7 @@ void loop() {
       }
       
       break;
-      
+ /*
     case 32:
       // do a spin
       // turn until both censors are equal??
@@ -223,26 +260,6 @@ void loop() {
       delay(500);
       
       state = 33;
-      
-      
-      /*
-      int distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
-      int distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
-
-      wheelsRotateLeft (LITTLE_LESS_THAN_HALF_TURN_TIME);
-      
-      Serial.println(distance_left);
-      
-      if (distance_right > distance_left) {
-        stopWheels(20);
-        state = 33;
-        Serial.println("I am here, look at me");
-      }
-      else {
-        wheelsRotateLft(20);
-      }
-      */
-      
       break;
       
     case 33:
@@ -353,79 +370,8 @@ void loop() {
     case 61:
       // need to go back to the start/stop area
       break;
+      */
   }
-
-/**
-  switch (state) {
-
-    case 0: 
-      int distance_ledge = sensorDistance(LEDGE_SENSOR_TRIGGER, LEDGE_SENSOR_ECHO);
-      
-      if (distance_ledge > 5) {
-        stopWheels(20);
-        state = 1;
-      }
-      else {
-        wheelsGoRight(20);
-      }
-      break;
-      
-    case 1: 
-    
-      Serial.println("I am here");
-      
-      int distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
-      int distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
-      
-      if (distance_left < 18 && distance_right < 18) {
-        stopWheels(20);
-        state = 2;
-      }
-      else {
-        wheelsGoForward(20);
-      }
-      break;
-  }
-*/
-  
-/**
-  int distance_ledge = sensorDistance(LEDGE_SENSOR_TRIGGER, LEDGE_SENSOR_ECHO);
-  Serial.println(distance_ledge);
-
-  if (distance_ledge > 5) {
-    stopWheels(20);
-  }
-  else {
-    wheelsGoRight(20);
-  }
-*/
-
-  
-/**
-  int distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
-  int distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
-
-  if (distance_left < 5 && distance_right < 5) {
-    stopWheels(20);
-  }
-  else {
-    wheelsGoForward(20);
-  }
-*/
-
-  
-
-/**
-  wheelsGoForward(4000);
-
-  wheelsGoLeft(4000);
-
-  wheelsGoBackwards(4000);
-
-  wheelsGoRight(4000);
-
-  wheelsRoateLeft(4000);
-*/
 }
 
 void wheelsGoForwards(int delay_time) {
@@ -474,6 +420,16 @@ void wheelsGoRight(int delay_time) {
   
 }
 
+void stopWheels(int delay_time){
+
+  for(int i = 0; i < 8; i++) {
+    
+    digitalWrite(wheel_motor_pins[i], LOW);
+  }
+
+  delay(delay_time);
+}
+
 void wheelsRotateLeft(int delay_time) {
 
   for(int i = 2; i < 6; i++) {
@@ -488,74 +444,72 @@ void wheelsRotateLeft(int delay_time) {
 void liftArm(int delay_time) {
   int motor_speed = 255;
 
-  analogWrite(scooper_motor_pins[8], motor_speed);
-  digitalWrite(scooper_motor_pins[6], HIGH);
+  analogWrite(LIFTER_SPEED, motor_speed);
+  digitalWrite(LIFTER_FORWARDS, HIGH);
 
   delay(delay_time);
 
-  digitalWrite(scooper_motor_pins[6], LOW);
+  digitalWrite(LIFTER_FORWARDS, LOW);
 
 }
 
 void dropArm(int delay_time) {
   int motor_speed = 255; // motor speed (0-255)
 
-  analogWrite(scooper_motor_pins[8], motor_speed);
-  digitalWrite(scooper_motor_pins[7], HIGH);
+  analogWrite(LIFTER_SPEED, motor_speed);
+  digitalWrite(LIFTER_BACKWARDS, HIGH);
 
   delay(delay_time);
 
-  digitalWrite(scooper_motor_pins[7], LOW);
+  digitalWrite(LIFTER_BACKWARDS, LOW);
 
 }
 
 void extendArm(int delay_time) {
   int motor_speed = 255; // motor speed (0-255)
 
-  analogWrite(scooper_motor_pins[2], motor_speed);
-  digitalWrite(scooper_motor_pins[0], HIGH);
+  analogWrite(EXTENDER_SPEED, motor_speed);
+  digitalWrite(EXTENDER_FORWARDS, HIGH);
 
   delay(delay_time);
 
-  digitalWrite(scooper_motor_pins[0], LOW);
+  digitalWrite(EXTENDER_FORWARDS, LOW);
 
 }
 
 void retractArm(int delay_time) {
   int motor_speed = 255; // motor speed (0-255)
 
-  analogWrite(scooper_motor_pins[2], motor_speed);
-  digitalWrite(scooper_motor_pins[0], HIGH);
+  analogWrite(EXTENDER_SPEED, motor_speed);
+  digitalWrite(EXTENDER_BACKWARDS, HIGH);
 
   delay(delay_time);
 
-  digitalWrite(scooper_motor_pins[0], LOW);
+  digitalWrite(EXTENDER_BACKWARDS, LOW);
 
 }
 
-void rackOut() {
+void rackOut(int delay_time) {
   int motor_speed = 255; // motor speed (0-255)
-  int delay_time = RACKING_TIME; // time of motor operation (ms)
 
-  analogWrite(scooper_motor_pins[5], motor_speed);
-  digitalWrite(scooper_motor_pins[3], HIGH);
+  analogWrite(BALL_REMOVER_SPEED, motor_speed);
+  digitalWrite(BALL_REMOVER_FORWARDS, HIGH);
 
   delay(delay_time);
 
-  digitalWrite(scooper_motor_pins[3], LOW);
+  digitalWrite(BALL_REMOVER_FORWARDS, LOW);
 
 }
 
-void rackIn() {
+void rackIn(int delay_time) {
   int motor_speed = 255; // motor speed (0-255)
-  int delay_time = RACKING_TIME; // time of motor operation (ms)
 
-  analogWrite(scooper_motor_pins[5], motor_speed);
-  digitalWrite(scooper_motor_pins[4], HIGH);
+  analogWrite(BALL_REMOVER_SPEED, motor_speed);
+  digitalWrite(BALL_REMOVER_BACKWARDS, HIGH);
 
   delay(delay_time);
 
-  digitalWrite(scooper_motor_pins[4], LOW);
+  digitalWrite(BALL_REMOVER_BACKWARDS, LOW);
 
 }
   
