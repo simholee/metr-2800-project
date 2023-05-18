@@ -4,6 +4,7 @@ const int LEFT_BACK_WHEEL_FORWARDS = 40;
 const int LEFT_BACK_WHEEL_BACKWARDS = 38;
 const int LEFT_FRONT_WHEEL_FORWARDS = 36;
 const int LEFT_FRONT_WHEEL_BACKWARDS = 34;
+const int LEFT_FRONT_WHEEL_SPEED = 11;
 const int RIGHT_BACK_WHEEL_FORWARDS = 48;
 const int RIGHT_BACK_WHEEL_BACKWARDS = 46;
 const int RIGHT_FRONT_WHEEL_FORWARDS = 50;
@@ -21,6 +22,13 @@ const int LEDGE_SENSOR_ECHO = 53;
 
 int sensor_pins[6] = {LEFT_SENSOR_TRIGGER, RIGHT_SENSOR_TRIGGER, LEDGE_SENSOR_TRIGGER, LEFT_SENSOR_ECHO, RIGHT_SENSOR_ECHO, LEDGE_SENSOR_ECHO};
 
+float left_sensor_recordings[20];
+float right_sensor_recordings[20];
+float ledge_sensor_recordings[20];
+float distance_ledge;
+float distance_left;
+float distance_right;
+
 // Scooper Motor Pins
 
 const int EXTENDER_FORWARDS = 30;
@@ -35,8 +43,6 @@ const int LIFTER_SPEED = 9;
 
 int scooper_motor_pins[9] = {EXTENDER_FORWARDS, EXTENDER_BACKWARDS, EXTENDER_SPEED, BALL_REMOVER_FORWARDS, BALL_REMOVER_BACKWARDS, BALL_REMOVER_SPEED, LIFTER_FORWARDS, LIFTER_BACKWARDS, LIFTER_SPEED};
 
-int state = 12;
-
 // Times for different exercises
 
 const int TENNIS_ARM_LIFTING_TIME = 5000;
@@ -49,10 +55,9 @@ const int TENNIS_ARM_EXTENDING_TIME = 28000;
 // const int MIDDLING_TIME = x;
 const int RACKING_TIME = 2000;
 
-int distance_ledge;
-int distance_left;
-int distance_right;
-
+// MISC
+const int DEBUGGING_LED = 10;
+int state = 12;
 
 void setup() {
 
@@ -62,9 +67,6 @@ void setup() {
     pinMode(wheel_motor_pins[i], OUTPUT);
     pinMode(wheel_motor_pins[i], LOW);
   }
-
-  pinMode(11, OUTPUT);
-  digitalWrite(11, HIGH);
  
   // Set Sensor Pins
 
@@ -84,12 +86,33 @@ void setup() {
     pinMode(scooper_motor_pins[i], OUTPUT);
   }
 
+  pinMode(LEFT_FRONT_WHEEL_SPEED, OUTPUT);
+  digitalWrite(LEFT_FRONT_WHEEL_SPEED, HIGH);
+
+  pinMode(DEBUGGING_LED, OUTPUT);
+  digitalWrite(DEBUGGING_LED, HIGH);
+
+
+  pinMode(DEBUGGING_LED, OUTPUT);
+  digitalWrite(DEBUGGING_LED, HIGH);
+
+
+  pinMode(BALL_REMOVER_SPEED, OUTPUT);
+  digitalWrite(BALL_REMOVER_SPEED, HIGH);
+
+  pinMode(EXTENDER_SPEED, OUTPUT);
+  digitalWrite(EXTENDER_SPEED, HIGH);
+
+  pinMode(LIFTER_SPEED, OUTPUT);
+  digitalWrite(LIFTER_SPEED, HIGH);
+
   Serial.begin(9600);
 }
 
 void loop() {
-  Serial.println("Pissing my pants rn fr");
+  Serial.println("Simho Smells");
 
+  recordSensorReadings();
   
   switch (state) {
     case 11:
@@ -106,26 +129,24 @@ void loop() {
     case 12: 
       // drive right
       Serial.println("State 1");
-      
-      distance_ledge = sensorDistance(LEDGE_SENSOR_TRIGGER, LEDGE_SENSOR_ECHO);
 
       // Serial.println(distance_ledge);
-    
-      if (distance_ledge > 10) {
+
+      if (distance_ledge > 0) {
+
+        if (distance_ledge > 10) {
         stopWheels(1000);
         state = 13;
-      }
-      else {
-        wheelsGoRight(20);
+        }
+        else {
+          wheelsGoRight(20);
+        }
       }
       break;
       
     case 13: 
       // drive forward
       Serial.println("State 2");
-      
-      distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
-      distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
 
       Serial.println(distance_left);
       Serial.println(distance_right);
@@ -236,8 +257,6 @@ void loop() {
     case 31:
       // drive backwards
       Serial.println("State 8");
-      
-      distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
       
       Serial.println(distance_left);
       
@@ -442,9 +461,7 @@ void wheelsRotateLeft(int delay_time) {
 }
 
 void liftArm(int delay_time) {
-  int motor_speed = 255;
 
-  analogWrite(LIFTER_SPEED, motor_speed);
   digitalWrite(LIFTER_FORWARDS, HIGH);
 
   delay(delay_time);
@@ -454,9 +471,7 @@ void liftArm(int delay_time) {
 }
 
 void dropArm(int delay_time) {
-  int motor_speed = 255; // motor speed (0-255)
 
-  analogWrite(LIFTER_SPEED, motor_speed);
   digitalWrite(LIFTER_BACKWARDS, HIGH);
 
   delay(delay_time);
@@ -466,9 +481,7 @@ void dropArm(int delay_time) {
 }
 
 void extendArm(int delay_time) {
-  int motor_speed = 255; // motor speed (0-255)
-
-  analogWrite(EXTENDER_SPEED, motor_speed);
+  
   digitalWrite(EXTENDER_FORWARDS, HIGH);
 
   delay(delay_time);
@@ -478,9 +491,7 @@ void extendArm(int delay_time) {
 }
 
 void retractArm(int delay_time) {
-  int motor_speed = 255; // motor speed (0-255)
-
-  analogWrite(EXTENDER_SPEED, motor_speed);
+  
   digitalWrite(EXTENDER_BACKWARDS, HIGH);
 
   delay(delay_time);
@@ -490,9 +501,7 @@ void retractArm(int delay_time) {
 }
 
 void rackOut(int delay_time) {
-  int motor_speed = 255; // motor speed (0-255)
 
-  analogWrite(BALL_REMOVER_SPEED, motor_speed);
   digitalWrite(BALL_REMOVER_FORWARDS, HIGH);
 
   delay(delay_time);
@@ -502,9 +511,7 @@ void rackOut(int delay_time) {
 }
 
 void rackIn(int delay_time) {
-  int motor_speed = 255; // motor speed (0-255)
 
-  analogWrite(BALL_REMOVER_SPEED, motor_speed);
   digitalWrite(BALL_REMOVER_BACKWARDS, HIGH);
 
   delay(delay_time);
@@ -514,10 +521,10 @@ void rackIn(int delay_time) {
 }
   
 
-int sensorDistance(int trigger_pin, int echo_pin) {
+float sensorDistance(int trigger_pin, int echo_pin) {
 
   unsigned long duration;
-  int distance; 
+  float distance; 
 
   digitalWrite(trigger_pin, LOW);
   delayMicroseconds(2);
@@ -530,7 +537,68 @@ int sensorDistance(int trigger_pin, int echo_pin) {
   // Calculating the distance
   distance = duration * 0.034 / 2;
 
-  delay(20);
+  delay(13);
   
   return distance;
+}
+
+
+void flashDebuggingLed() {
+
+  digitalWrite(DEBUGGING_LED, HIGH);
+
+  delay(200);
+
+  digitalWrite(DEBUGGING_LED, LOW);
+}
+
+
+void recordSensorReadings() {
+
+  // Takes multiple measurements and stores in an array
+  for (int sample = 0; sample < 20; sample++) {
+    left_sensor_recordings[sample] = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
+    right_sensor_recordings[sample] = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
+    ledge_sensor_recordings[sample] = sensorDistance(LEDGE_SENSOR_TRIGGER, LEDGE_SENSOR_ECHO);
+  }
+
+  //Sort the array in ascening order 
+  for (int i = 0; i < 19; i++) {
+    for (int j = i + 1; j < 20; j++) {
+
+      if (left_sensor_recordings[i] > left_sensor_recordings[j]) {
+        float swap = left_sensor_recordings[i];
+        left_sensor_recordings[i] = left_sensor_recordings[j];
+        left_sensor_recordings[j] = swap;
+      }
+
+      if (right_sensor_recordings[i] > right_sensor_recordings[j]) {
+        float swap = right_sensor_recordings[i];
+        right_sensor_recordings[i] = right_sensor_recordings[j];
+        right_sensor_recordings[j] = swap;
+      }
+
+      if (ledge_sensor_recordings[i] > ledge_sensor_recordings[j]) {
+        float swap = ledge_sensor_recordings[i];
+        ledge_sensor_recordings[i] = ledge_sensor_recordings[j];
+        ledge_sensor_recordings[j] = swap;
+      }
+    }  
+  }
+
+  // Filter Noise - Average of 10 middle samples
+
+  double left_sum = 0;
+  double right_sum = 0;
+  double ledge_sum = 0;
+  
+  for (int sample = 5; sample < 15; sample++) {
+    left_sum += left_sensor_recordings[sample];
+    right_sum += right_sensor_recordings[sample];
+    ledge_sum += ledge_sensor_recordings[sample];
+  }
+
+  distance_left = left_sum / 10;
+  distance_right = right_sum / 10;
+  distance_ledge = ledge_sum / 10;
 }
