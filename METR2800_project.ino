@@ -291,6 +291,142 @@ void loop() {
         }
         
         break;   
+        
+      case 32:
+      // do a spin
+      // turn until both censors are equal??
+      Serial.println("State 9");
+      
+      wheelsRotateLeft(HALF_TURN_TIME);
+      delay(500);
+      
+      state = 33;
+      
+      
+      /*
+      int distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
+      int distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
+      wheelsRotateLeft (LITTLE_LESS_THAN_HALF_TURN_TIME);
+      
+      Serial.println(distance_left);
+      
+      if (distance_right > distance_left) {
+        stopWheels(20);
+        state = 33;
+        Serial.println("I am here, look at me");
+      }
+      else {
+        wheelsRotateLft(20);
+      }
+      */
+      
+      break;
+      
+    case 33:
+      // drive rightwards -> Until when?? maybe a hundredish milliseconds after initial sensoring
+      Serial.println("State 10");
+      
+      int distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
+      Serial.println(distance_right);
+      
+      if (distance_right < 30) { // check the numbers on this depending on how close the squash balls are
+        wheelsGoRight(MIDDLING_TIME);
+        stopWheels(20);
+        state = 41;
+      }
+      else {
+        wheelsGoRight(20);
+      }
+      
+      break;
+      
+    case 41:
+      // drive forwards - sensor use
+      Serial.println("State 11");
+      
+      int distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
+      Serial.println(distance_left);
+      
+      if (distance_left < 18) {
+        stopWheels(20);
+        state = 42;
+        Serial.println("I am here, look at me");
+      }
+      else {
+        wheelsGoForwards(20);
+      }
+      
+      break;
+      
+    case 42:
+      // drive rightwards
+      Serial.println("State 12");
+      
+      wheelsGoRight(FINAL_RIGHT_MOVEMENT_TIME);
+      delay(500);
+      
+      state = 51;
+      
+      break;
+    case 51:
+      // lift arm [squash ball]
+      Serial.println("State 13");
+      
+      liftArm(SQUASH_ARM_LIFTING_TIME);
+      delay(500);
+      
+      state = 52;
+      
+      break;
+      
+    case 52:
+      // extend arm [squash ball]
+      Serial.println("State 14")
+      
+      extendArm(SQUASH_ARM_EXTENDING_TIME);
+      delay(500);
+      
+      state = 53;
+      
+      break;
+    case 53:
+      // rack and unrack
+      Serial.println("State 15");
+      
+      rackOut();
+      delay(500);
+      
+      rackIn();
+      delay(500);
+      
+      state = 54;
+      
+      break;
+      
+    case 54:
+      // retract arm [squash ball]
+      Serial.println("State 17");
+      
+      retractArm(SQUASH_ARM_EXTENDING_TIME);
+      delay(500);
+      
+      state = 55;
+      
+      break;
+      
+    case 55:
+      // drop arm [squash ball]
+      Serial.println("State 16");
+      
+      dropArm(SQUASH_ARM_LIFTING_TIME);
+      delay(500);
+      
+      state = 61;
+      
+      break;
+    case 61:
+      // need to go back to the start/stop area
+      break;
   }
   }
 }
