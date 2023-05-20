@@ -66,7 +66,7 @@ const int RACKING_TIME = 2000;
 
 // MISC
 const int DEBUGGING_LED = 10;
-int state = 12;
+int state = 11;
 
 void setup() {
 
@@ -151,102 +151,112 @@ void loop() {
     
     switch (state) {
       case 11:
-        // drop arm [start]
-        Serial.println("State 0");
+        // Start - Drop Arm
         
-        dropArm(TENNIS_ARM_LIFTING_TIME);
-        delay(500);
+        dropArm(2800);
+        delay(200);
         
         state = 12;
         
         break;
         
       case 12: 
-        // drive right
-        Serial.println("State 1");
-  
-        // Serial.println(distance_ledge);
-  
-        Serial.println(distance_ledge);
-  
+        // Drive forwards to pickup balls 
+        
+        wheelsGoForwards(5000);
+        stopWheels(20);
+
+        state = 13;
+      
+        break;
+
+      case 13: 
+        // Lift arm to above ledge height
+
+        liftArm(800);
+        delay(100);
+
+        state = 14;
+
+        break;
+
+      case 14: 
+         // Rotate wheels left to be in line with ledge
+         
+         wheelsRotateLeft(5000);
+         stopWheels(20);
+
+         state = 15;
+
+         break;
+
+      case 15:
+        // Drive forwards to force straight allignment 
+
+        wheelsGoForwards(3000);
+        stopWheels(20);
+
+        state = 16;
+      
+        break;
+
+      case 16: 
+        // Drive right to the ledge and stop to be in line with silo
+
         measure_distance_ledge = true;
   
         if (distance_ledge > 10) {
-        stopWheels(500);
-        state = 13;
+        stopWheels(200);
+        state = 17;
         measure_distance_ledge = false; 
         }
         else {
           wheelsGoRight(20);
         }
         break;
-        
-      case 13: 
-        // drive forward
-        Serial.println("State 2");
-  
-        Serial.println(distance_left);
-        Serial.println(distance_right);
-  
-        measure_distance_left = true;
-        measure_distance_right = true; 
-          
-        if (distance_left < 14 && distance_right < 14) {
-          stopWheels(20);
-          state = 14;
-          measure_distance_left = false;
-          measure_distance_right = false; 
-        }
-        else {
-          wheelsGoForwards(20);
-        }
-        
-        break;
-        
-      case 14:
-        // lift arm [tennis ball]
-        Serial.println("State 3");
-        
-        liftArm(850);
-        delay(200);
-        wheelsGoBackwards(1000);
+
+      case 17: 
+        // Drive backwards to give room for extension 
+
+        wheelsGoBackwards(2000);
         stopWheels(200);
-        
-        state = 15;
-        
+
+        state = 18;
+
         break;
-        
-        // DO WE NEED TO DRIVE FORWARD HERE???
-      case 15:
+
+      case 18:
+        // Extend arm just above ledge height 
   
-        extendArm(14000);
+        extendArm(17600);
         delay(500);
   
-        state = 16;
+        state = 19;
         
         break;
         
-      case 16:
-        // extend arm [tennis ball]
-        liftArm(3600);
+      case 19:
+        // Lift arm to above tennis ball slio height 
+        
+        liftArm(4500);
         delay(500);
         
-        state = 17;
+        state = 20;
         
         break;
         
-      case 17:
-        // rack and unrack
-        Serial.println("State 5");
+      case 20:
+        // Drive lifted arm to silo edge
         
         wheelsGoForwards(3000);
         stopWheels(20);
   
-        state = 18;
+        state = 21;
         
         break;
   
-      case 18:
+      case 21:
+        //Rack and unrack to deposit tennis balls
   
         rackOut(2500);
         delay(200);
@@ -323,6 +333,17 @@ void wheelsRotateLeft(int delay_time) {
     
     digitalWrite(wheel_motor_pins[i], HIGH);
   }
+
+  delay(delay_time);
+  
+}
+
+void wheelsRotateRight(int delay_time) {
+
+  digitalWrite(LEFT_BACK_WHEEL_FORWARDS, HIGH);
+  digitalWrite(LEFT_FRONT_WHEEL_FORWARDS, HIGH);
+  digitalWrite(RIGHT_BACK_WHEEL_BACKWARDS, HIGH);
+  digitalWrite(RIGHT_FRONT_WHEEL_BACKWARDS, HIGH);
 
   delay(delay_time);
   
