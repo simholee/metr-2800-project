@@ -60,13 +60,13 @@ const int TENNIS_ARM_EXTENDING_TIME = 28000;
 // const int SQUASH_ARM_EXTENDING_TIME = x;
 // const int FINAL_RIGHT_MOVEMENT_TIME = x;
 // const int QUARTER_TURN_TIME = x;
-// const int HALF_TURN_TIME = x;
+const int HALF_TURN_TIME = 1000;
 // const int MIDDLING_TIME = x;
 const int RACKING_TIME = 2000;
 
 // MISC
 const int DEBUGGING_LED = 10;
-int state = 12;
+int state = 32;
 
 void setup() {
 
@@ -126,7 +126,8 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Simho Smells");
+
+  recordSensorReadings();
 
   if (digitalRead(EXTEND_ARM)) {
     digitalWrite(EXTENDER_FORWARDS, HIGH);
@@ -143,8 +144,6 @@ void loop() {
     digitalWrite(LIFTER_FORWARDS, LOW);
     digitalWrite(LIFTER_BACKWARDS, LOW);
 
-    recordSensorReadings();
-    
     switch (state) {
       case 11:
         // drop arm [start]
@@ -293,35 +292,55 @@ void loop() {
         break;   
         
       case 32:
-      // do a spin
-      // turn until both censors are equal??
-      Serial.println("State 9");
-      
-      wheelsRotateLeft(HALF_TURN_TIME);
-      delay(500);
-      
-      state = 33;
-      
-      
-      /*
-      int distance_left = sensorDistance(LEFT_SENSOR_TRIGGER, LEFT_SENSOR_ECHO);
-      int distance_right = sensorDistance(RIGHT_SENSOR_TRIGGER, RIGHT_SENSOR_ECHO);
-      wheelsRotateLeft (LITTLE_LESS_THAN_HALF_TURN_TIME);
-      
-      Serial.println(distance_left);
-      
-      if (distance_right > distance_left) {
-        stopWheels(20);
-        state = 33;
-        Serial.println("I am here, look at me");
-      }
-      else {
-        wheelsRotateLft(20);
-      }
-      */
-      
-      break;
-      
+        // do a spin
+        // turn until both censors are equal??
+        measure_distance_left = true;
+        measure_distance_right = true;
+
+        Serial.println(distance_right);
+
+        if (distance_right > 100) {
+          wheelsRotateLeft(200);
+          stopWheels(2000);
+          for (int i=0; i<5; i++) {
+            digitalWrite(DEBUGGING_LED, LOW);
+            delay(200);
+            digitalWrite(DEBUGGING_LED, HIGH);
+            delay(200);
+          }
+          state = 33;
+          Serial.println("going");
+        }
+        else {
+          wheelsRotateLeft(20);
+        }
+
+        if (state == 33) {
+          Serial.println("Next State");
+        }
+        break;
+
+      case 33:
+        
+        if (distance_right > 100) {
+          wheelsRotateLeft(20);
+        }
+        else if (distance_right < (distance_left + 3)) {
+          stopWheels(20);
+          state = 33;
+          for (int i=0; i<10; i++) {
+            digitalWrite(DEBUGGING_LED, LOW);
+            delay(200);
+            digitalWrite(DEBUGGING_LED, HIGH);
+            delay(200);
+          }
+          Serial.println("I am here, look at me");
+        }
+        else {
+          wheelsRotateLeft(20);
+        }
+
+    /*
     case 33:
       // drive rightwards -> Until when?? maybe a hundredish milliseconds after initial sensoring
       Serial.println("State 10");
@@ -330,7 +349,7 @@ void loop() {
       Serial.println(distance_right);
       
       if (distance_right < 30) { // check the numbers on this depending on how close the squash balls are
-        wheelsGoRight(MIDDLING_TIME);
+        wheelsGoRight(MIDDLING_TIME); // go back and forth and measure time -> middle that
         stopWheels(20);
         state = 41;
       }
@@ -427,6 +446,7 @@ void loop() {
     case 61:
       // need to go back to the start/stop area
       break;
+      */
   }
   }
 }
