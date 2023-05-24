@@ -47,26 +47,15 @@ const int LIFTER_SPEED = 9;
 int scooper_motor_pins[9] = {EXTENDER_FORWARDS, EXTENDER_BACKWARDS, EXTENDER_SPEED, BALL_REMOVER_FORWARDS, BALL_REMOVER_BACKWARDS, BALL_REMOVER_SPEED, LIFTER_FORWARDS, LIFTER_BACKWARDS, LIFTER_SPEED};
 
 // Testing Pins 
+
 const int EXTEND_ARM = 41;
 const int RETRACT_ARM = 43;
 const int LIFT_ARM = 45;
 const int DROP_ARM = 47;
 
-// Times for different exercises
-
-const int TENNIS_ARM_LIFTING_TIME = 5000;
-// const int SQUASH_ARM_LIFTING_TIME = x;
-const int TENNIS_ARM_EXTENDING_TIME = 28000;
-// const int SQUASH_ARM_EXTENDING_TIME = x;
-// const int FINAL_RIGHT_MOVEMENT_TIME = x;
-// const int QUARTER_TURN_TIME = x;
-// const int HALF_TURN_TIME = x;
-// const int MIDDLING_TIME = x;
-const int RACKING_TIME = 2000;
-
 // MISC
 const int DEBUGGING_LED = 10;
-int state = 10;
+int state = 1;  // Intial State : 13
 
 void setup() {
 
@@ -94,6 +83,8 @@ void setup() {
   for(int i = 0; i < 9; i++) {
     pinMode(scooper_motor_pins[i], OUTPUT);
   }
+
+  // Set Misc Pins
 
   pinMode(LEFT_FRONT_WHEEL_SPEED, OUTPUT);
   digitalWrite(LEFT_FRONT_WHEEL_SPEED, HIGH);
@@ -129,19 +120,28 @@ void loop() {
   Serial.println("Simho Smells");
 
   if (!digitalRead(EXTEND_ARM)) {
+    
     stopWheels(20);
     digitalWrite(EXTENDER_FORWARDS, HIGH);
+    
   } else if (!digitalRead(RETRACT_ARM)) {
+    
     stopWheels(20);
     digitalWrite(EXTENDER_BACKWARDS, HIGH);
+    
   } else if (!digitalRead(LIFT_ARM)) {
+    
     stopWheels(20);
     digitalWrite(LIFTER_FORWARDS, HIGH);
+    
   } else if (!digitalRead(DROP_ARM)) {
+    
     stopWheels(20);
     digitalWrite(LIFTER_BACKWARDS, HIGH);
+    
   } else {
 
+    // If test pins not active -> Do nothing
     digitalWrite(EXTENDER_FORWARDS, LOW); 
     digitalWrite(EXTENDER_BACKWARDS, LOW);
     digitalWrite(LIFTER_FORWARDS, LOW);
@@ -149,74 +149,73 @@ void loop() {
     
     switch (state) {
       case 0:
-        // dsklajfkldsajflkdj
+        // Debugging State 
 
-        wheelsGoForwards(1200);
+        wheelsRotateLeft(1000);
 
         break;
 
-      case 10:
+      case 1:
         // Start - Drop Arm
         
         dropArm(2800);
-        delay(100);
+        delay(30);
         
-        state = 11;
+        state = 2;
         
         break;
       
-      case 11:
-        // pre-extend
+      case 2:
+        // Pre-Extend Arm
 
-        extendArm(6000);
-        liftArm(1400);
+        extendArm(5500);
+        delay(30);
 
-
-        state = 12;
+        state = 3;
 
         break;
         
-      case 12: 
-        // Drive forwards to pickup balls 
+      case 3: 
+        // Lift arm to just above ledge height
+
+        liftArm(1900);
+        delay(30);
+
+        state = 4;
+        
+        break;
+
+      case 4: 
+        // Drive forwards to be closer to silo 
         
         wheelsGoForwards(5000);
         stopWheels(20);
 
-        state = 13;
-      
-        break;
-
-      case 13: 
-        // Lift arm to above ledge height
-
-        
-        delay(100);
-
-        state = 14;
+        state = 5;
 
         break;
 
-      case 14: 
+      case 5: 
         // Rotate wheels left to be in line with ledge
          
         wheelsRotateLeft(5000);
         stopWheels(20);
 
-        state = 15;
+        state = 6;
 
         break;
 
-      case 15:
+      case 6:
         // Drive forwards to force straight allignment 
 
         wheelsGoForwards(3000);
         stopWheels(20);
 
-        state = 16;
+        state = 7;
       
         break;
 
-      case 16: 
+      case 7: 
         // Drive right to the ledge and stop to be in line with silo
 
         measure_distance_ledge = true;
@@ -225,7 +224,7 @@ void loop() {
   
         if (distance_ledge > 10) {
         stopWheels(20);
-        state = 17;
+        state = 8;
         measure_distance_ledge = false; 
         }
         else {
@@ -233,185 +232,196 @@ void loop() {
         }
         break;
 
-      case 17: 
+      case 8: 
         // Drive backwards to give room for extension 
 
         wheelsGoBackwards(2000);
         stopWheels(200);
 
-        state = 18;
+        state = 9;
 
         break;
 
-      case 18:
+      case 9:
         // Extend arm just above ledge height 
   
-        extendArm(5500);
-        delay(100);
+        extendArm(4200);
+        delay(30);
   
-        state = 19;
+        state = 10;
         
         break;
         
-      case 19:
+      case 10:
         // Lift arm to above tennis ball slio height 
         
-        liftArm(6000);
-        delay(100);
+        liftArm(7500);
+        delay(30);
+        wheelsGoLeft(200);
+        stopWheels(20);
         
-        state = 20;
+        state = 11;
         
         break;
         
-      case 20:
+      case 11:
         // Drive lifted arm to silo edge
         
         wheelsGoForwards(3000);
         stopWheels(20);
   
-        state = 21;
+        state = 12;
         
         break;
   
-      case 21:
+      case 12:
         //Rack and unrack to deposit tennis balls
   
         rackOut(3000);
-        delay(1000);
+        delay(50);
   
         rackIn(1500);
-        delay(1000);
+        delay(30);
   
-        state = 22;
+        state = 13;
   
         break;
 
-      case 22: 
+      case 13: 
         // Drive backwards to retract
 
         wheelsGoBackwards(3000);
         stopWheels(20);
 
-        state = 23;
+        state = 14;
 
         break;
 
-      case 23:
+      case 14:
         //Drop arm for retraction against silo 
 
-        dropArm(1250);
-        delay(100);
+        dropArm(1550);
+        delay(30);
 
-        state = 24; 
+        state = 15; 
 
         break;
 
-      case 24:
+      case 15:
         // Drive forwards while retracting
 
         wheelsGoForwards(20);
 
         retractArm(3600);
+        delay(30);
 
         stopWheels(20);
 
-        state = 25;
+        state = 16;
 
         break;
 
-      case 25: 
+      case 16: 
         // Lift a little for full retraction potential
 
-        liftArm(1500);
+        liftArm(2200);
+        delay(30);
 
-        delay(100);
-
-        state = 26;
+        state = 17;
 
         break;
 
-      case 26:
-        // retraction for preperation for squash
+      case 17:
+        // Retraction for preperation for squash
 
         retractArm(4700);
+        delay(30);
 
-        delay(100);
-
-        state = 27;
+        state = 18;
 
         break;
 
-      case 27: 
+      case 18: 
+        // Drive backwards to make sure arm does not drop onto ledge 
 
         wheelsGoBackwards(2500);
-        stopWheels(20);
+        stopWheels(300);
 
-        state = 28;
+        state = 19;
 
         break;
 
-      case 28:
+      case 19:
+        // Drop arm into fully retarcted mode, so that it can pick up squash balls
+        analogWrite(LIFTER_SPEED, 150);
+        dropArm(4200);
+        delay(30);
+        digitalWrite(LIFTER_SPEED, HIGH);
 
-        dropArm(3150);
-
-        delay(100);
-
-        state = 29;
+        state = 20;
       
         break;
 
-      case 29:
+      case 20:
+        // Maneuver to be in position to pick up squash balls
+        /*
         wheelsGoLeft(500);
         stopWheels(20);
 
-        wheelsRotateLeft(5800);
+        wheelsRotateLeft(5450);
         stopWheels(20);
 
-        wheelsGoBackwards(550);
+        wheelsGoBackwards(200);
         stopWheels(20);
 
         wheelsGoLeft(11000);
         stopWheels(20);
 
-        state = 30;
+        state = 21;
 
         break;
-        /*
+        */
+        
         measure_distance_ledge = true;
 
         recordSensorReadings();
   
         if (distance_ledge > 10) {
-        stopWheels(20);
-        wheelsGoBackwards(4500);
-        wheelsGoLeft(1000);
-        wheelsRotateLeft(5000);
-        wheelsGoLeft(3000);
-        measure_distance_ledge = false; 
-        state = 30;
-        }
-        else {
+          stopWheels(20);
+
+          wheelsGoBackwards(6500);
+          stopWheels(20);
+
+          wheelsRotateLeft(6000);
+          stopWheels(20);
+
+          wheelsGoLeft(2000);
+          stopWheels(20);
+
+          measure_distance_ledge = false; 
+          state = 21;
+
+        } else {
           wheelsGoRight(20);
         }
-
+ 
         break;
-        */
 
-      case 30: 
+      case 21: 
         // Pickup squash balls 
 
         wheelsGoForwards(3000);
         stopWheels(20);
 
-        liftArm(1900);
-        delay(100);
+        liftArm(2500);
+        delay(30);
 
-        state = 31;
+        state = 22;
 
         break;
 
-      case 31: 
-        //Rotate to direction of squash silo
+      case 22: 
+        // Rotate to direction of squash silo
 
         wheelsGoRight(500);
         stopWheels(20);
@@ -422,11 +432,11 @@ void loop() {
         wheelsGoForwards(3000);
         stopWheels(20);
 
-        state = 32;
+        state = 23;
 
         break;
 
-      case 32:
+      case 23:
         // Drive to ledge to create allignment 
       
         measure_distance_ledge = true;
@@ -435,7 +445,7 @@ void loop() {
 
         if (distance_ledge > 10) {
           stopWheels(20);
-          state = 33;
+          state = 24;
           measure_distance_ledge = false; 
         }
         else {
@@ -443,49 +453,49 @@ void loop() {
         }
         break;
 
-      case 33:
+      case 24:
         // Drive left to align with squash ball silo 
 
-        wheelsGoLeft(3600);
+        wheelsGoLeft(4000);
         stopWheels(20);
 
-        state = 34;
+        state = 25;
 
         break;
 
-      case 34:
+      case 25:
         // Extend arm to reach squash silo
 
         extendArm(11000);
-        delay(100);
+        delay(30);
 
-        state = 35;
+        state = 26;
 
         break;
-      case 35:
-        // go forwards
+      case 26:
+        // Drive forwards, against the ledge, to allign with squash silo 
 
-        wheelsGoForwards(1000);
+        wheelsGoForwards(1500);
         stopWheels(20);
-        state = 36;
         
-
+        state = 27;
+        
         break;
 
-      case 36: 
+      case 27: 
         //Rack and unrack to deposit squash balls
   
         rackOut(3700);
-        delay(100);
+        delay(50);
   
         rackIn(1500);
-        delay(100);
+        delay(30);
   
-        state = 37;
+        state = 28;
   
         break;
 
-      case 37:
+      case 28:
         // Drive to start/stop zone and finish!!!!!
 
         wheelsGoRight(700);
@@ -494,11 +504,13 @@ void loop() {
         wheelsGoBackwards(5700);
         stopWheels(20);
 
-        state = 38;
+        state = 29;
         
         break;
-      case 38:
-        // kill
+        
+      case 29:
+        // Kill
+        
         stopWheels(20);
         
         break;
